@@ -13,16 +13,41 @@
         --cyan: #00ffff;
         --pink: #ff00ff;
         --bg-dark: #010103;
-        --bg-panel: #0a0a0f;
+        --bg-panel: rgba(10, 10, 15, 0.75); /* Made transparent for video */
     }
 
     body {
         margin: 0; padding: 40px;
-        background-color: var(--bg-dark);
         color: var(--cyan);
         font-family: 'Courier New', Courier, monospace;
+        position: relative;
+        min-height: 100vh;
     }
 
+    /* ────────────────────────────────────────────────
+       Background Video Integration
+       ──────────────────────────────────────────────── */
+    .bg-video {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        object-fit: cover; /* Ensures perfect scaling on all devices */
+        z-index: -2;
+        filter: grayscale(30%) brightness(0.6) contrast(1.2);
+    }
+
+    .video-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: linear-gradient(to bottom, rgba(1,1,3,0.6), rgba(1,1,3,0.9));
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    /* ────────────────────────────────────────────────
+       UI Elements
+       ──────────────────────────────────────────────── */
     .header-container {
         border-bottom: 2px solid var(--pink);
         padding-bottom: 20px;
@@ -32,10 +57,11 @@
         align-items: flex-end;
         flex-wrap: wrap;
         gap: 20px;
+        position: relative;
     }
 
     h1 {
-        margin: 0; font-size: 2.5rem; letter-spacing: 4px;
+        margin: 0; font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: 4px;
         text-shadow: 0 0 15px var(--cyan);
         color: #fff;
     }
@@ -56,10 +82,12 @@
         box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
         align-items: center;
         flex-wrap: wrap;
+        backdrop-filter: blur(8px); /* Frosts the video behind the panel */
+        -webkit-backdrop-filter: blur(8px);
     }
 
     .control-panel input {
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.6);
         border: 1px solid rgba(0, 255, 255, 0.5);
         color: var(--cyan);
         padding: 10px;
@@ -78,11 +106,19 @@
 
     .control-panel input::placeholder { color: rgba(0, 255, 255, 0.3); }
 
+    /* Tables */
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Fixes layout breaking on small phones */
+    }
+
     table {
         width: 100%; border-collapse: collapse;
         background-color: var(--bg-panel);
         box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
         margin-bottom: 30px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
     }
 
     th, td {
@@ -91,30 +127,30 @@
     }
 
     th {
-        background-color: rgba(255, 0, 255, 0.1);
+        background-color: rgba(255, 0, 255, 0.15);
         color: var(--pink);
         font-weight: bold; letter-spacing: 2px;
     }
 
-    td { font-size: 0.9rem; word-break: break-all; }
+    td { font-size: 0.9rem; word-break: break-all; color: #fff; }
 
-    .index-id { font-weight: bold; color: #fff; }
+    .index-id { font-weight: bold; color: var(--cyan); }
     .asset-type { color: #aaaaaa; }
 
     a {
-        color: var(--cyan); text-decoration: none;
+        color: var(--pink); text-decoration: none;
         transition: text-shadow 0.3s ease;
     }
 
-    a:hover { text-shadow: 0 0 10px var(--cyan); }
+    a:hover { text-shadow: 0 0 10px var(--pink); }
 
     /* Buttons */
     .btn-action {
-        background: transparent; color: var(--cyan);
+        background: rgba(0, 0, 0, 0.5); color: var(--cyan);
         border: 1px solid var(--cyan); padding: 10px 20px;
         font-family: inherit; font-size: 1rem; font-weight: bold;
         letter-spacing: 2px; cursor: pointer; transition: all 0.3s ease;
-        white-space: nowrap;
+        white-space: nowrap; backdrop-filter: blur(4px);
     }
     .btn-action:hover {
         background: var(--cyan); color: var(--bg-dark);
@@ -128,9 +164,18 @@
 
     /* Extraction Console */
     #extraction-console {
-        background: #000; border: 1px solid var(--pink); color: var(--pink);
+        background: rgba(0, 0, 0, 0.8); border: 1px solid var(--pink); color: var(--pink);
         padding: 15px; margin-bottom: 30px; font-family: monospace; font-size: 0.85rem;
         height: 200px; overflow-y: auto; display: none; white-space: pre-wrap;
+        backdrop-filter: blur(8px);
+    }
+
+    /* Mobile Adaptability */
+    @media (max-width: 768px) {
+        body { padding: 20px; }
+        .header-container { flex-direction: column; align-items: flex-start; }
+        .btn-action { width: 100%; text-align: center; }
+        .header-container div:last-child { width: 100%; display: flex; flex-direction: column; gap: 10px; }
     }
 
     /* Print-Specific Styles */
@@ -138,14 +183,18 @@
         @page { size: landscape; margin: 10mm; }
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         body { background-color: var(--bg-dark) !important; padding: 0; }
-        .no-print { display: none !important; }
-        table { page-break-inside: auto; }
+        .bg-video, .video-overlay, .no-print { display: none !important; }
+        table { page-break-inside: auto; background-color: #000 !important; }
         tr { page-break-inside: avoid; page-break-after: auto; }
         td, th { border-color: #333 !important; }
     }
 </style>
 </head>
 <body>
+
+    <!-- Responsive Background Video Elements -->
+    <video class="bg-video" id="bgVideo" src="https://files.catbox.moe/gmgn0b.mp4" autoplay loop muted playsinline></video>
+    <div class="video-overlay"></div>
 
     <div class="header-container">
         <div>
@@ -172,22 +221,30 @@
     </div>
 
     <!-- Live Data Table -->
-    <table>
-        <thead>
-            <tr>
-                <th width="15%">INDEX ID</th>
-                <th width="15%">TYPE</th>
-                <th width="25%">DESCRIPTION / ASSIGNMENT</th>
-                <th width="25%">RAW URL</th>
-                <th width="20%">ORIGIN</th>
-            </tr>
-        </thead>
-        <tbody id="manifest-body">
-            <tr><td colspan="5" style="text-align:center; color:#555;">Awaiting telemetry...</td></tr>
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th width="15%">INDEX ID</th>
+                    <th width="15%">TYPE</th>
+                    <th width="25%">DESCRIPTION / ASSIGNMENT</th>
+                    <th width="25%">RAW URL</th>
+                    <th width="20%">ORIGIN</th>
+                </tr>
+            </thead>
+            <tbody id="manifest-body">
+                <tr><td colspan="5" style="text-align:center; color:#555;">Awaiting telemetry...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
 <script>
+    // iOS safety override to guarantee background video playback
+    document.body.addEventListener('click', () => {
+        const vid = document.getElementById('bgVideo');
+        if (vid && vid.paused) vid.play().catch(e => console.log(e));
+    }, { once: true });
+
     const manifestBody = document.getElementById('manifest-body');
     const sysStatus = document.getElementById('sys-status');
     const extractionConsole = document.getElementById('extraction-console');
@@ -195,7 +252,7 @@
     const OMEGA_REPO_NAME = 'mesh-emv-indexing.vercel.app';
     let dbClient = null;
 
-    // Boot Engine with Retry Logic (Fixes the hanging issue)
+    // Boot Engine with Retry Logic
     function bootSystem() {
         if (window.supabase) {
             initSupabase();
@@ -207,7 +264,7 @@
                     clearInterval(checkInterval);
                     initSupabase();
                 }
-                if (retries++ > 50) { // Timeout after 5 seconds
+                if (retries++ > 50) { 
                     clearInterval(checkInterval);
                     sysStatus.innerText = "CRITICAL: SUPABASE SCRIPT BLOCKED BY BROWSER OR NETWORK.";
                     sysStatus.className = "sys-msg error-msg";
@@ -353,7 +410,6 @@
         window.logBrainAction('page_load', { title: document.title });
     }
 
-    // Ensure DOM is ready before booting to prevent Vercel race conditions
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', bootSystem);
     } else {
