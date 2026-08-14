@@ -1,0 +1,28 @@
+{
+  "name": "nexus-vortex-devkit",
+  "version": "1.0.0",
+  "description": "A Web-Native 3D World Engine and Procedural WebGL Environment",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "threejs",
+    "webgl",
+    "procedural-generation",
+    "cyberpunk",
+    "supabase",
+    "nexus"
+  ],
+  "author": "Omega Mind",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.8",
+    "three": "^0.168.0"
+  }
+}
