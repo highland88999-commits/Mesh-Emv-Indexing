@@ -30,6 +30,8 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 20px;
     }
 
     h1 {
@@ -43,8 +45,8 @@
         margin-top: 10px;
     }
 
-    /* Injection Form Styles */
-    .injection-panel {
+    /* Injection & Extraction Panels */
+    .control-panel {
         background-color: var(--bg-panel);
         border: 1px solid var(--cyan);
         padding: 20px;
@@ -56,7 +58,7 @@
         flex-wrap: wrap;
     }
 
-    .injection-panel input {
+    .control-panel input {
         background: rgba(0, 0, 0, 0.5);
         border: 1px solid rgba(0, 255, 255, 0.5);
         color: var(--cyan);
@@ -69,17 +71,18 @@
         transition: border-color 0.3s, box-shadow 0.3s;
     }
 
-    .injection-panel input:focus {
+    .control-panel input:focus {
         border-color: var(--cyan);
         box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
     }
 
-    .injection-panel input::placeholder { color: rgba(0, 255, 255, 0.3); }
+    .control-panel input::placeholder { color: rgba(0, 255, 255, 0.3); }
 
     table {
         width: 100%; border-collapse: collapse;
         background-color: var(--bg-panel);
         box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        margin-bottom: 30px;
     }
 
     th, td {
@@ -117,9 +120,18 @@
         background: var(--cyan); color: var(--bg-dark);
         box-shadow: 0 0 15px var(--cyan);
     }
+    .btn-alt { border-color: var(--pink); color: var(--pink); }
+    .btn-alt:hover { background: var(--pink); color: var(--bg-dark); box-shadow: 0 0 15px var(--pink); }
 
-    .sys-msg { color: var(--pink); font-size: 0.85rem; margin-top: 10px; display: block; }
-    .error-msg { color: #ff003c; text-shadow: 0 0 10px #ff003c; }
+    .sys-msg { color: var(--pink); font-size: 0.85rem; margin-top: 10px; display: block; font-weight: bold;}
+    .error-msg { color: #ff003c !important; text-shadow: 0 0 10px #ff003c; }
+
+    /* Extraction Console */
+    #extraction-console {
+        background: #000; border: 1px solid var(--pink); color: var(--pink);
+        padding: 15px; margin-bottom: 30px; font-family: monospace; font-size: 0.85rem;
+        height: 200px; overflow-y: auto; display: none; white-space: pre-wrap;
+    }
 
     /* Print-Specific Styles */
     @media print {
@@ -139,15 +151,21 @@
         <div>
             <h1>NEXUS VORTEX</h1>
             <div class="subtitle">DYNAMIC ASSET MANIFEST & DB UPLINK</div>
-            <div id="sys-status" class="sys-msg">ESTABLISHING OMEGA MIND LINK...</div>
+            <div id="sys-status" class="sys-msg">INITIALIZING SYSTEM...</div>
         </div>
-        <button class="btn-action no-print" onclick="window.print()">[ EXPORT TO PDF ]</button>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-action btn-alt no-print" onclick="testPayloadExtraction()">[ TEST PAYLOAD EXTRACT ]</button>
+            <button class="btn-action no-print" onclick="window.print()">[ EXPORT TO PDF ]</button>
+        </div>
     </div>
 
+    <!-- Payload Extraction Console -->
+    <div id="extraction-console" class="no-print">Awaiting extraction command...</div>
+
     <!-- Data Injection Panel -->
-    <div class="injection-panel no-print">
+    <div class="control-panel no-print">
         <input type="text" id="inp-id" placeholder="INDEX_ID (e.g. BIOME_01)">
-        <input type="text" id="inp-type" placeholder="TYPE (e.g. Audio .mp3)">
+        <input type="text" id="inp-type" placeholder="TYPE (e.g. Video .mp4)">
         <input type="text" id="inp-desc" placeholder="DESCRIPTION / ASSIGNMENT">
         <input type="url" id="inp-url" placeholder="RAW URL (https://...)">
         <button class="btn-action" id="btn-inject" onclick="injectAsset()">[ INJECT ASSET ]</button>
@@ -160,28 +178,66 @@
                 <th width="15%">INDEX ID</th>
                 <th width="15%">TYPE</th>
                 <th width="25%">DESCRIPTION / ASSIGNMENT</th>
-                <th width="45%">RAW URL</th>
+                <th width="25%">RAW URL</th>
+                <th width="20%">ORIGIN</th>
             </tr>
         </thead>
         <tbody id="manifest-body">
-            <!-- Data injected via Supabase -->
-            <tr><td colspan="4" style="text-align:center; color:#555;">Awaiting telemetry...</td></tr>
+            <tr><td colspan="5" style="text-align:center; color:#555;">Awaiting telemetry...</td></tr>
         </tbody>
     </table>
 
 <script>
-    // 1. Initialize Supabase
-    const SUPABASE_URL = 'https://amulgdbdvxpikpmldyoq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtdWxnZGJkdnhwaWtwbWxkeW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MDU3MzgsImV4cCI6MjEwMTk4MTczOH0.0eZ3SfWhUEzSLpDDKEE_3vp5siXF00akRp5jX1dM-dA';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     const manifestBody = document.getElementById('manifest-body');
     const sysStatus = document.getElementById('sys-status');
+    const extractionConsole = document.getElementById('extraction-console');
+    
+    const OMEGA_REPO_NAME = 'mesh-emv-indexing.vercel.app';
+    let dbClient = null;
 
-    // 2. Fetch Assets from Supabase
+    // Boot Engine with Retry Logic (Fixes the hanging issue)
+    function bootSystem() {
+        if (window.supabase) {
+            initSupabase();
+        } else {
+            sysStatus.innerText = "WAITING FOR CDN CONNECTION...";
+            let retries = 0;
+            let checkInterval = setInterval(() => {
+                if (window.supabase) {
+                    clearInterval(checkInterval);
+                    initSupabase();
+                }
+                if (retries++ > 50) { // Timeout after 5 seconds
+                    clearInterval(checkInterval);
+                    sysStatus.innerText = "CRITICAL: SUPABASE SCRIPT BLOCKED BY BROWSER OR NETWORK.";
+                    sysStatus.className = "sys-msg error-msg";
+                    manifestBody.innerHTML = '<tr><td colspan="5" class="error-msg" style="text-align:center;">Network Error: Cannot reach Supabase CDN. Check Adblockers.</td></tr>';
+                }
+            }, 100);
+        }
+    }
+
+    async function initSupabase() {
+        sysStatus.innerText = "ESTABLISHING OMEGA MIND LINK...";
+        try {
+            const SUPABASE_URL = 'https://amulgdbdvxpikpmldyoq.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtdWxnZGJkdnhwaWtwbWxkeW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MDU3MzgsImV4cCI6MjEwMTk4MTczOH0.0eZ3SfWhUEzSLpDDKEE_3vp5siXF00akRp5jX1dM-dA';
+            
+            dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            await fetchAssets();
+            initTelemetry();
+
+        } catch (err) {
+            console.error("Init Error:", err);
+            sysStatus.innerText = "CRITICAL ERROR: " + err.message;
+            sysStatus.className = "sys-msg error-msg";
+        }
+    }
+
     async function fetchAssets() {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await dbClient
                 .from('asset_manifest')
                 .select('*')
                 .order('index_id', { ascending: true });
@@ -189,32 +245,36 @@
             if (error) throw error;
 
             if (data && data.length > 0) {
-                manifestBody.innerHTML = ''; // Clear table
+                manifestBody.innerHTML = ''; 
                 data.forEach(asset => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="index-id">${escapeHTML(asset.index_id)}</td>
                         <td class="asset-type">${escapeHTML(asset.asset_type)}</td>
                         <td>${escapeHTML(asset.description)}</td>
-                        <td><a href="${escapeHTML(asset.raw_url)}" target="_blank">${escapeHTML(asset.raw_url)}</a></td>
+                        <td><a href="${escapeHTML(asset.raw_url)}" target="_blank">LINK</a></td>
+                        <td style="color:#888; font-size:0.75rem;">${escapeHTML(asset.origin_repo)}</td>
                     `;
                     manifestBody.appendChild(row);
                 });
                 sysStatus.innerText = `LINK SECURE. FETCHED ${data.length} ASSETS.`;
                 sysStatus.className = "sys-msg";
             } else {
-                manifestBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">DATABASE EMPTY. RUN SQL SCRIPT.</td></tr>';
+                manifestBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">DATABASE CONNECTED BUT EMPTY.</td></tr>';
+                sysStatus.innerText = `LINK SECURE. 0 ASSETS FOUND.`;
+                sysStatus.className = "sys-msg";
             }
         } catch (err) {
-            console.error("Database Error:", err);
+            console.error("Database Fetch Error:", err);
             sysStatus.innerText = "ERROR: FAILED TO FETCH. DID YOU RUN THE SQL SCRIPT?";
             sysStatus.className = "sys-msg error-msg";
-            manifestBody.innerHTML = `<tr><td colspan="4" class="error-msg" style="text-align:center;">${err.message}</td></tr>`;
+            manifestBody.innerHTML = `<tr><td colspan="5" class="error-msg" style="text-align:center;">Database Error: ${err.message}</td></tr>`;
         }
     }
 
-    // 3. Inject New Asset to Supabase
-    async function injectAsset() {
+    window.injectAsset = async function() {
+        if (!dbClient) return alert("System not initialized.");
+
         const idInput = document.getElementById('inp-id');
         const typeInput = document.getElementById('inp-type');
         const descInput = document.getElementById('inp-desc');
@@ -225,7 +285,9 @@
             index_id: idInput.value.trim().toUpperCase(),
             asset_type: typeInput.value.trim(),
             description: descInput.value.trim(),
-            raw_url: urlInput.value.trim()
+            raw_url: urlInput.value.trim(),
+            origin_repo: window.location.hostname || OMEGA_REPO_NAME,
+            origin_url: window.location.href
         };
 
         if (!payload.index_id || !payload.raw_url) {
@@ -237,12 +299,12 @@
         btnInject.style.pointerEvents = "none";
 
         try {
-            const { error } = await supabase.from('asset_manifest').insert([payload]);
+            const { error } = await dbClient.from('asset_manifest').insert([payload]);
             if (error) throw error;
 
-            // Clear form and refresh table on success
             idInput.value = ''; typeInput.value = ''; descInput.value = ''; urlInput.value = '';
-            sysStatus.innerText = `SUCCESS: INJECTED ${payload.index_id} INTO DB.`;
+            sysStatus.innerText = `SUCCESS: INJECTED ${payload.index_id} FROM ${payload.origin_repo}.`;
+            sysStatus.className = "sys-msg";
             await fetchAssets();
             
         } catch (err) {
@@ -254,32 +316,49 @@
         }
     }
 
-    // Security helper to prevent XSS in table rendering
+    window.testPayloadExtraction = async function() {
+        extractionConsole.style.display = 'block';
+        extractionConsole.innerText = "Initiating payload extraction via RPC...";
+        
+        try {
+            const { data: payload, error } = await dbClient.rpc('extract_asset_payload');
+            
+            if (error) throw error;
+
+            extractionConsole.innerText = `[SUCCESS] Payload Extracted (${payload.length} objects):\n\n` + JSON.stringify(payload, null, 2);
+        } catch (err) {
+            extractionConsole.innerText = `[SYS_ERR] RPC Extraction Failed:\n${err.message}\n\nDid you run the SQL script to create the 'extract_asset_payload' function?`;
+        }
+    }
+
     function escapeHTML(str) {
-        if (!str) return "";
+        if (!str) return "UNKNOWN";
         return str.replace(/[&<>'"]/g, 
             tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag])
         );
     }
 
-    // Load on init
-    window.addEventListener('DOMContentLoaded', fetchAssets);
-
-    // Baseline Telemetry
-    (function() {
-        const REPO_NAME = window.OMEGA_REPO_NAME || window.location.hostname || 'Manifest-Node';
+    function initTelemetry() {
         let clientIP = 'Detecting...';
         fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => { clientIP = data.ip; }).catch(() => {});
         window.logBrainAction = async function(actionType, details = {}) {
             try {
-                await supabase.from('central_telemetry').insert([{
-                    repository_name: REPO_NAME, action_type: actionType,
+                await dbClient.from('central_telemetry').insert([{
+                    repository_name: window.location.hostname || OMEGA_REPO_NAME, 
+                    action_type: actionType,
                     details: { ...details, ip_address: clientIP, url: window.location.href, timestamp: new Date().toISOString() }
                 }]);
             } catch (err) {}
         };
-        window.addEventListener('load', () => window.logBrainAction('page_load', { title: document.title }));
-    })();
+        window.logBrainAction('page_load', { title: document.title });
+    }
+
+    // Ensure DOM is ready before booting to prevent Vercel race conditions
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootSystem);
+    } else {
+        bootSystem();
+    }
 </script>
 
 </body>
