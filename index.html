@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS WORLD • Master Architect</title>
+    <!-- LANGUAGE UPDATE -->
+    <title>NEXUS WORLD • World Creator</title>
     
-    <!-- SUPABASE UPLINK -->
+    <!-- SYSTEM UPLINK (Supabase) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -46,6 +47,7 @@
             position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(1,4,9,0.3), rgba(1,4,9,0.9)); z-index: -1;
         }
 
+        /* LANGUAGE UPDATE */
         h1 { margin: 0; font-size: clamp(2rem, 5vw, 3rem); letter-spacing: 6px; text-shadow: 0 0 15px var(--neon-cyan), var(--text-outline); color: #fff; }
         .subtitle { font-size: 1rem; letter-spacing: 3px; color: var(--neon-pink); margin-top: 10px; font-weight: bold; text-shadow: var(--text-outline); }
 
@@ -134,16 +136,18 @@
         <video src="https://files.catbox.moe/pkzibl.mp4" autoplay loop muted playsinline class="header-bg-video"></video>
         <div class="header-overlay"></div>
         
-        <h1>NEXUS MASTER NODE</h1>
-        <div class="subtitle">WORLD ARCHITECT & BRIDGE INJECTION</div>
-        <div id="sys-status" class="sys-msg" style="color:var(--neon-cyan);">ESTABLISHING OMEGA MIND LINK...</div>
+        <!-- LANGUAGE UPDATE -->
+        <h1>NEXUS CONTROL PANEL</h1>
+        <div class="subtitle">WORLD CREATOR & ADDRESS CONNECTION</div>
+        <div id="sys-status" class="sys-msg" style="color:var(--neon-cyan);">CONNECTING TO OMEGA SYSTEM...</div>
     </header>
 
     <!-- Carousel Navigation -->
+    <!-- LANGUAGE UPDATE -->
     <div class="carousel-nav">
-        <button class="nav-btn active" onclick="setSlide(0)">1. WORLD BRIDGE</button>
-        <button class="nav-btn" onclick="setSlide(1)">2. OBJECT BRIDGE</button>
-        <button class="nav-btn" onclick="setSlide(2)">3. ARCHITECT BUILD</button>
+        <button class="nav-btn active" onclick="setSlide(0)">1. WORLD LINK</button>
+        <button class="nav-btn" onclick="setSlide(1)">2. OBJECT LINK</button>
+        <button class="nav-btn" onclick="setSlide(2)">3. CREATE WORLD</button>
     </div>
 
     <main class="carousel-container">
@@ -151,23 +155,24 @@
         <!-- PAGE 1: WORLD CALL MATCHING -->
         <div id="slide-0" class="page-section active">
             <div class="h-panel">
-                <h2>WORLD GENERATOR BRIDGE</h2>
+                <!-- LANGUAGE UPDATE -->
+                <h2>WORLD ADDRESS SETUP</h2>
                 <div class="form-group">
-                    <label>SELECT REPOSITORY BRIDGE LINK</label>
+                    <label>SELECT TARGET WORLD SYSTEM</label>
                     <select id="world-bridge-select">
-                        <option value="WORLD_GEN_CORE_ALPHA">Nexus Master Engine (mesh-emv-indexing)</option>
-                        <option value="WORLD_GEN_EXPANSION">Sub-Dimensional Biome Generator</option>
+                        <option value="WORLD_GEN_CORE_ALPHA">Nexus Main Engine (mesh-emv-indexing)</option>
+                        <option value="WORLD_GEN_EXPANSION">Area Generator B</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>WORLD MATCHING INDEX ID</label>
-                    <input type="text" id="world-name-id" placeholder="e.g. BIOME_INFERNO">
+                    <label>WORLD NAME OR ID</label>
+                    <input type="text" id="world-name-id" placeholder="e.g. INFERNO_ZONE">
                 </div>
                 <div class="form-group">
-                    <label>INJECT WORLD CODE / WRAP LINK</label>
-                    <textarea id="world-payload" placeholder="Paste raw environment wrap URL (.mov, .mp4)..."></textarea>
+                    <label>PASTE WORLD LINK / ADDRESS</label>
+                    <textarea id="world-payload" placeholder="Paste raw environment address URL (.mov, .mp4)..."></textarea>
                 </div>
-                <button class="btn-action" onclick="injectManifest('world')">DEPLOY WORLD INJECTION</button>
+                <button class="btn-action" onclick="injectManifest('world')">CONNECT WORLD ADDRESS</button>
                 <div id="world-feedback" class="sys-msg"></div>
             </div>
             <!-- Move to next slide -->
@@ -177,23 +182,24 @@
         <!-- PAGE 2: OBJECT CALL MATCHING -->
         <div id="slide-1" class="page-section">
             <div class="h-panel">
-                <h2>OBJECT ENTITY BRIDGE</h2>
+                <!-- LANGUAGE UPDATE -->
+                <h2>OBJECT CONNECTION SETUP</h2>
                 <div class="form-group">
-                    <label>SELECT WORLD REPOSITORY TARGET</label>
+                    <label>SELECT TARGET WORLD FOR OBJECTS</label>
                     <select id="object-bridge-select">
-                        <option value="OBJ_RIG_BEHEMOTH">Kinematic Creature & Behemoth Rig</option>
-                        <option value="OBJ_UI_HOLO">Holographic Terminal / UI Panel</option>
+                        <option value="OBJ_RIG_BEHEMOTH">Creature & Monster Setup</option>
+                        <option value="OBJ_UI_HOLO">Hologram Display / Screen Panel</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>OBJECT ENTITY MATCHING ID</label>
-                    <input type="text" id="object-name-id" placeholder="e.g. ENTITY_DRAGON_SKIN">
+                    <label>OBJECT NAME OR ID</label>
+                    <input type="text" id="object-name-id" placeholder="e.g. DRAGON_MODEL">
                 </div>
                 <div class="form-group">
-                    <label>INJECT OBJECT SCRIPT / TEXTURE LINK</label>
-                    <textarea id="object-payload" placeholder="Paste skin texture URL (.png) or logic code..."></textarea>
+                    <label>PASTE OBJECT LINK / ADDRESS</label>
+                    <textarea id="object-payload" placeholder="Paste texture URL (.png) or object code..."></textarea>
                 </div>
-                <button class="btn-action" onclick="injectManifest('object')">DEPLOY OBJECT INJECTION</button>
+                <button class="btn-action" onclick="injectManifest('object')">CONNECT OBJECT ADDRESS</button>
                 <div id="object-feedback" class="sys-msg"></div>
             </div>
             <!-- Move to next slide -->
@@ -203,48 +209,52 @@
         <!-- PAGE 3: WORLD GENERATOR (ARCHITECT) -->
         <div id="slide-2" class="page-section">
             <div class="h-panel">
-                <h2>ARCHITECT PLANETARY COMPILER</h2>
+                <!-- LANGUAGE UPDATE -->
+                <h2>WORLD CREATION COMPILER</h2>
                 <p style="font-size:0.8rem; color:#88a0b5; margin-bottom: 15px;">
-                    Use the links you injected in the previous steps, or input new parameters to finalize the planetary build via Gemini.
+                    Use the links you connected in the previous steps, or input new parameters to finalize the world build.
                 </p>
                 <div class="form-group">
-                    <label>Designate World Name</label>
+                    <label>Set World Name</label>
                     <input type="text" id="final-world-name" placeholder="e.g. Tartarus">
                 </div>
                 <div class="form-group">
-                    <label>Target Web Link (Portal Destination)</label>
+                    <label>Portal Destination Link</label>
                     <input type="url" id="final-target-url" placeholder="https://...">
                 </div>
                 <hr style="border: 0; border-bottom: 1px solid rgba(0,240,255,0.2); margin: 20px 0;">
-                <div class="form-group"><label>Space Atmosphere (URL)</label><input type="text" id="tex-space"></div>
-                <div class="form-group"><label>Sky Dome (URL)</label><input type="text" id="tex-sky"></div>
-                <div class="form-group"><label>Land Mass / Terrain (URL)</label><input type="text" id="tex-land"></div>
-                <div class="form-group"><label>Water Layer (URL)</label><input type="text" id="tex-water"></div>
+                <div class="form-group"><label>Space Backdrop (URL)</label><input type="text" id="tex-space"></div>
+                <div class="form-group"><label>Sky View (URL)</label><input type="text" id="tex-sky"></div>
+                <div class="form-group"><label>Ground / Terrain (URL)</label><input type="text" id="tex-land"></div>
+                <div class="form-group"><label>Water Area (URL)</label><input type="text" id="tex-water"></div>
                 
-                <button class="btn-action btn-submit" id="generate-gemini-btn" onclick="triggerGeneration()">🚀 COMPILE WORLD VIA GEMINI</button>
+                <button class="btn-action btn-submit" id="generate-gemini-btn" onclick="triggerGeneration()">🚀 CREATE WORLD VIA ENGINE</button>
                 <div id="gen-feedback" class="sys-msg"></div>
             </div>
         </div>
     </main>
 
     <!-- Minimizable Telemetry View -->
-    <button class="telemetry-toggle" onclick="toggleTelemetry()">[ EXPAND TELEMETRY & ENGINE VIEW ]</button>
+    <!-- LANGUAGE UPDATE -->
+    <button class="telemetry-toggle" onclick="toggleTelemetry()">[ VIEW SYSTEM STATUS & LIVE ENGINE ]</button>
 
     <div class="telemetry-container" id="telemetry-container">
         <!-- Tables -->
         <div class="table-wrapper">
             <table>
                 <thead>
-                    <tr><th>INDEX ID</th><th>TARGET BRIDGE</th><th>PAYLOAD PREVIEW</th><th>ORIGIN NODE</th></tr>
+                    <!-- LANGUAGE UPDATE -->
+                    <tr><th>NAME/ID</th><th>CONNECTION TYPE</th><th>ADDRESS PREVIEW</th><th>SOURCE SYSTEM</th></tr>
                 </thead>
                 <tbody id="telemetry-feed">
-                    <tr><td colspan="4" style="text-align:center;">Syncing matrix...</td></tr>
+                    <tr><td colspan="4" style="text-align:center;">Syncing with system...</td></tr>
                 </tbody>
             </table>
         </div>
 
         <!-- Nexus World Engine Iframe -->
-        <h2 style="text-align:center; color:var(--neon-cyan); border:none; margin: 10px 0;">NEXUS WORLD ENGINE NODE</h2>
+        <!-- LANGUAGE UPDATE -->
+        <h2 style="text-align:center; color:var(--neon-cyan); border:none; margin: 10px 0;">LIVE WORLD VIEW</h2>
         <div class="engine-frame-container">
             <iframe src="https://nexus-world-engine.vercel.app" allow="autoplay; fullscreen"></iframe>
         </div>
@@ -264,7 +274,8 @@
     async function initSystem() {
         if (!window.supabase) return;
         dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        document.getElementById('sys-status').innerText = "OMEGA MIND LINK SECURE.";
+        // LANGUAGE UPDATE
+        document.getElementById('sys-status').innerText = "SYSTEM LINK SECURE.";
         fetchTelemetryFeeds();
         
         // Auto-fill inputs on Tab 3 from inputs on Tab 1 & 2 for convenience
@@ -299,11 +310,13 @@
         const btn = document.querySelector('.telemetry-toggle');
         if (telemetryOpen) {
             container.style.display = 'flex';
-            btn.innerText = "[ MINIMIZE TELEMETRY & ENGINE VIEW ]";
+            // LANGUAGE UPDATE
+            btn.innerText = "[ HIDE SYSTEM STATUS & LIVE ENGINE ]";
             fetchTelemetryFeeds(); // Refresh data when opened
         } else {
             container.style.display = 'none';
-            btn.innerText = "[ EXPAND TELEMETRY & ENGINE VIEW ]";
+            // LANGUAGE UPDATE
+            btn.innerText = "[ VIEW SYSTEM STATUS & LIVE ENGINE ]";
         }
     }
 
@@ -311,7 +324,7 @@
     // Data Injection (World & Object Bridges)
     // ────────────────────────────────────────────────
     window.injectManifest = async function(type) {
-        if (!dbClient) return alert("Database not initialized.");
+        if (!dbClient) return alert("System not initialized.");
         const isWorld = type === 'world';
         
         const bridgeSelect = document.getElementById(isWorld ? 'world-bridge-select' : 'object-bridge-select').value;
@@ -320,16 +333,17 @@
         const feedback = document.getElementById(isWorld ? 'world-feedback' : 'object-feedback');
 
         if (!indexId || !payloadVal) {
-            feedback.innerText = "Error: ID and Payload required.";
+            feedback.innerText = "Error: ID and Address required.";
             return;
         }
 
-        feedback.innerText = "INJECTING PROTOCOL...";
+        // LANGUAGE UPDATE
+        feedback.innerText = "CONNECTING ADDRESS...";
         
         const record = {
             index_id: indexId,
-            asset_type: isWorld ? `WORLD_BRIDGE_${bridgeSelect}` : `OBJ_BRIDGE_${bridgeSelect}`,
-            description: "Carousel Bridge Injection",
+            asset_type: isWorld ? `WORLD_${bridgeSelect}` : `OBJ_${bridgeSelect}`,
+            description: "Carousel Address Connection",
             raw_url: payloadVal,
             origin_repo: OMEGA_REPO_NAME,
             origin_url: window.location.href
@@ -338,10 +352,12 @@
         try {
             const { error } = await dbClient.from('asset_manifest').insert([record]);
             if (error) throw error;
-            feedback.innerText = `SUCCESS: ${indexId} SECURED.`;
+            // LANGUAGE UPDATE
+            feedback.innerText = `SUCCESS: ${indexId} CONNECTED.`;
             if (telemetryOpen) fetchTelemetryFeeds();
         } catch (err) {
-            feedback.innerText = `FAULT: ${err.message}`;
+            // LANGUAGE UPDATE
+            feedback.innerText = `CONNECTION FAULT: ${err.message}`;
         }
     };
 
@@ -358,7 +374,8 @@
             feed.innerHTML = '';
             
             if (data.length === 0) {
-                feed.innerHTML = '<tr><td colspan="4" style="text-align:center;">Matrix Empty.</td></tr>';
+                // LANGUAGE UPDATE
+                feed.innerHTML = '<tr><td colspan="4" style="text-align:center;">System Database Empty.</td></tr>';
                 return;
             }
 
@@ -400,7 +417,8 @@
     // ────────────────────────────────────────────────
     window.triggerGeneration = async function() {
         const feedback = document.getElementById('gen-feedback');
-        feedback.innerText = "TRANSMITTING TO GEMINI API...";
+        // LANGUAGE UPDATE
+        feedback.innerText = "TRANSMITTING TO BUILDING ENGINE...";
 
         const payload = {
             targetUrl: document.getElementById('final-target-url').value || "https://nexus.olympus",
@@ -424,11 +442,13 @@
             
             const result = await response.json();
             console.log(result);
-            feedback.innerText = "WORLD SUCCESSFULLY COMPILED. CHECK DATABASE.";
+            // LANGUAGE UPDATE
+            feedback.innerText = "WORLD SUCCESSFULLY CREATED. CHECKING DATABASE...";
             
             // In a production app, redirect or show success iframe here
         } catch (err) {
-            feedback.innerText = `GENERATION FAULT: ${err.message}`;
+            // LANGUAGE UPDATE
+            feedback.innerText = `CREATION FAULT: ${err.message}`;
         }
     };
 
