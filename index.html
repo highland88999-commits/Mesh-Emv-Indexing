@@ -1,420 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NEXUS VORTEX - DYNAMIC ASSET MANIFEST</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS WORLD • Master Architect</title>
+    
+    <!-- SUPABASE UPLINK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff00ff;
+            --neon-blue: #0055ff;
+            --dark-bg: #010409;
+            --panel-bg: rgba(5, 5, 10, 0.75);
+            --border-color: rgba(0, 240, 255, 0.4);
+            --text-outline: 1.5px 1.5px 0 #000, -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
+        }
+        
+        body, html {
+            margin: 0; padding: 0; width: 100%; min-height: 100vh;
+            background-color: var(--dark-bg); color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden; box-sizing: border-box;
+        }
+        
+        /* ────────────────────────────────────────────────
+           Hero Header Background (Video)
+           ──────────────────────────────────────────────── */
+        header { 
+            position: relative; width: 100%; padding: 60px 20px; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            text-align: center; border-bottom: 2px solid var(--neon-cyan);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.2);
+            overflow: hidden;
+        }
+        
+        .header-bg-video {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: -2; filter: brightness(0.4) contrast(1.2);
+        }
+        .header-overlay {
+            position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(1,4,9,0.3), rgba(1,4,9,0.9)); z-index: -1;
+        }
 
-<!-- SUPABASE UPLINK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        h1 { margin: 0; font-size: clamp(2rem, 5vw, 3rem); letter-spacing: 6px; text-shadow: 0 0 15px var(--neon-cyan), var(--text-outline); color: #fff; }
+        .subtitle { font-size: 1rem; letter-spacing: 3px; color: var(--neon-pink); margin-top: 10px; font-weight: bold; text-shadow: var(--text-outline); }
 
-<style>
-    :root {
-        --cyan: #00ffff;
-        --pink: #ff00ff;
-        --bg-dark: #010103;
-        --bg-panel: rgba(10, 10, 15, 0.75); /* Made transparent for video */
-    }
+        /* ────────────────────────────────────────────────
+           Carousel Navigation
+           ──────────────────────────────────────────────── */
+        .carousel-nav {
+            display: flex; width: 100%; max-width: 800px; margin: 30px 0;
+            background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .nav-btn {
+            flex: 1; padding: 15px; background: transparent; color: var(--neon-cyan);
+            border: none; border-right: 1px solid var(--border-color);
+            font-family: inherit; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .nav-btn:last-child { border-right: none; }
+        .nav-btn.active { background: var(--neon-cyan); color: #000; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
+        .nav-btn:hover:not(.active) { background: rgba(0, 240, 255, 0.15); }
 
-    body {
-        margin: 0; padding: 40px;
-        color: var(--cyan);
-        font-family: 'Courier New', Courier, monospace;
-        position: relative;
-        min-height: 100vh;
-    }
+        /* Carousel Pages */
+        .carousel-container { width: 100%; max-width: 800px; position: relative; min-height: 400px; display: flex; flex-direction: column; align-items: center;}
+        .page-section { display: none; width: 100%; animation: fadeIn 0.4s ease-in-out; }
+        .page-section.active { display: flex; flex-direction: column; align-items: center; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ────────────────────────────────────────────────
-       Background Video Integration
-       ──────────────────────────────────────────────── */
-    .bg-video {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        object-fit: cover; /* Ensures perfect scaling on all devices */
-        z-index: -2;
-        filter: grayscale(30%) brightness(0.6) contrast(1.2);
-    }
+        /* Inputs & Panels */
+        .h-panel { width: 100%; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; box-sizing: border-box; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0, 240, 255, 0.1); backdrop-filter: blur(10px); }
+        h2 { color: var(--neon-pink); font-size: 1.1rem; border-bottom: 1px dashed rgba(255,0,255,0.4); padding-bottom: 10px; letter-spacing: 2px; margin-top: 0;}
+        .form-group { margin-bottom: 15px; width: 100%; }
+        label { display: block; font-size: 0.8rem; color: #fff; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        select, input, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid rgba(0,240,255,0.4); color: var(--neon-cyan); border-radius: 6px; font-family: inherit; box-sizing: border-box; outline: none; }
+        select:focus, input:focus, textarea:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0,240,255,0.3); }
+        textarea { height: 100px; resize: vertical; }
 
-    .video-overlay {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        background: linear-gradient(to bottom, rgba(1,1,3,0.6), rgba(1,1,3,0.9));
-        z-index: -1;
-        pointer-events: none;
-    }
+        .btn-action { background: rgba(0,0,0,0.5); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 12px 20px; font-family: inherit; font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; border-radius: 6px; width: 100%; text-transform: uppercase; }
+        .btn-action:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
+        .btn-submit { background: var(--neon-cyan); color: #000; font-size: 1.1rem; padding: 15px; }
+        .sys-msg { color: var(--neon-pink); font-size: 0.85rem; margin-top: 10px; text-align: center; }
 
-    /* ────────────────────────────────────────────────
-       UI Elements
-       ──────────────────────────────────────────────── */
-    .header-container {
-        border-bottom: 2px solid var(--pink);
-        padding-bottom: 20px;
-        margin-bottom: 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        gap: 20px;
-        position: relative;
-    }
+        /* ────────────────────────────────────────────────
+           Minimizable Telemetry View (Tables & Engine Frame)
+           ──────────────────────────────────────────────── */
+        .telemetry-toggle {
+            background: transparent; color: var(--neon-pink); border: 1px dashed var(--neon-pink);
+            padding: 10px 20px; font-family: inherit; font-size: 0.9rem; letter-spacing: 2px;
+            cursor: pointer; transition: all 0.3s; margin: 40px 0 20px 0; width: 100%; max-width: 800px;
+        }
+        .telemetry-toggle:hover { background: rgba(255,0,255,0.1); box-shadow: 0 0 15px rgba(255,0,255,0.3); }
 
-    h1 {
-        margin: 0; font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: 4px;
-        text-shadow: 0 0 15px var(--cyan);
-        color: #fff;
-    }
+        .telemetry-container {
+            width: 100%; max-width: 1200px; display: none; flex-direction: column; gap: 20px;
+            animation: fadeIn 0.4s;
+        }
 
-    .subtitle {
-        font-size: 1rem; letter-spacing: 2px; color: var(--pink);
-        margin-top: 10px;
-    }
+        .table-wrapper { width: 100%; overflow-x: auto; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; backdrop-filter: blur(10px); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border: 1px solid rgba(0, 240, 255, 0.2); font-size: 0.85rem; }
+        th { background: rgba(255,0,255,0.1); color: var(--neon-pink); }
+        td { color: #fff; }
 
-    /* Injection & Extraction Panels */
-    .control-panel {
-        background-color: var(--bg-panel);
-        border: 1px solid var(--cyan);
-        padding: 20px;
-        margin-bottom: 30px;
-        display: flex;
-        gap: 10px;
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-        align-items: center;
-        flex-wrap: wrap;
-        backdrop-filter: blur(8px); /* Frosts the video behind the panel */
-        -webkit-backdrop-filter: blur(8px);
-    }
+        .engine-frame-container {
+            width: 100%; height: 600px; border: 1px solid var(--neon-cyan); border-radius: 8px;
+            background: #000; overflow: hidden; box-shadow: 0 0 25px rgba(0,240,255,0.2);
+        }
+        .engine-frame-container iframe { width: 100%; height: 100%; border: none; }
 
-    .control-panel input {
-        background: rgba(0, 0, 0, 0.6);
-        border: 1px solid rgba(0, 255, 255, 0.5);
-        color: var(--cyan);
-        padding: 10px;
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 0.9rem;
-        outline: none;
-        flex: 1;
-        min-width: 150px;
-        transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .control-panel input:focus {
-        border-color: var(--cyan);
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-    }
-
-    .control-panel input::placeholder { color: rgba(0, 255, 255, 0.3); }
-
-    /* Tables */
-    .table-container {
-        width: 100%;
-        overflow-x: auto; /* Fixes layout breaking on small phones */
-    }
-
-    table {
-        width: 100%; border-collapse: collapse;
-        background-color: var(--bg-panel);
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-        margin-bottom: 30px;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-    }
-
-    th, td {
-        padding: 15px; text-align: left;
-        border: 1px solid rgba(0, 255, 255, 0.3);
-    }
-
-    th {
-        background-color: rgba(255, 0, 255, 0.15);
-        color: var(--pink);
-        font-weight: bold; letter-spacing: 2px;
-    }
-
-    td { font-size: 0.9rem; word-break: break-all; color: #fff; }
-
-    .index-id { font-weight: bold; color: var(--cyan); }
-    .asset-type { color: #aaaaaa; }
-
-    a {
-        color: var(--pink); text-decoration: none;
-        transition: text-shadow 0.3s ease;
-    }
-
-    a:hover { text-shadow: 0 0 10px var(--pink); }
-
-    /* Buttons */
-    .btn-action {
-        background: rgba(0, 0, 0, 0.5); color: var(--cyan);
-        border: 1px solid var(--cyan); padding: 10px 20px;
-        font-family: inherit; font-size: 1rem; font-weight: bold;
-        letter-spacing: 2px; cursor: pointer; transition: all 0.3s ease;
-        white-space: nowrap; backdrop-filter: blur(4px);
-    }
-    .btn-action:hover {
-        background: var(--cyan); color: var(--bg-dark);
-        box-shadow: 0 0 15px var(--cyan);
-    }
-    .btn-alt { border-color: var(--pink); color: var(--pink); }
-    .btn-alt:hover { background: var(--pink); color: var(--bg-dark); box-shadow: 0 0 15px var(--pink); }
-
-    .sys-msg { color: var(--pink); font-size: 0.85rem; margin-top: 10px; display: block; font-weight: bold;}
-    .error-msg { color: #ff003c !important; text-shadow: 0 0 10px #ff003c; }
-
-    /* Extraction Console */
-    #extraction-console {
-        background: rgba(0, 0, 0, 0.8); border: 1px solid var(--pink); color: var(--pink);
-        padding: 15px; margin-bottom: 30px; font-family: monospace; font-size: 0.85rem;
-        height: 200px; overflow-y: auto; display: none; white-space: pre-wrap;
-        backdrop-filter: blur(8px);
-    }
-
-    /* Mobile Adaptability */
-    @media (max-width: 768px) {
-        body { padding: 20px; }
-        .header-container { flex-direction: column; align-items: flex-start; }
-        .btn-action { width: 100%; text-align: center; }
-        .header-container div:last-child { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-    }
-
-    /* Print-Specific Styles */
-    @media print {
-        @page { size: landscape; margin: 10mm; }
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        body { background-color: var(--bg-dark) !important; padding: 0; }
-        .bg-video, .video-overlay, .no-print { display: none !important; }
-        table { page-break-inside: auto; background-color: #000 !important; }
-        tr { page-break-inside: avoid; page-break-after: auto; }
-        td, th { border-color: #333 !important; }
-    }
-</style>
+    </style>
 </head>
 <body>
 
-    <!-- Responsive Background Video Elements -->
-    <video class="bg-video" id="bgVideo" src="https://files.catbox.moe/gmgn0b.mp4" autoplay loop muted playsinline></video>
-    <div class="video-overlay"></div>
+    <header>
+        <!-- Hero Background Video -->
+        <video src="https://files.catbox.moe/pkzibl.mp4" autoplay loop muted playsinline class="header-bg-video"></video>
+        <div class="header-overlay"></div>
+        
+        <h1>NEXUS MASTER NODE</h1>
+        <div class="subtitle">WORLD ARCHITECT & BRIDGE INJECTION</div>
+        <div id="sys-status" class="sys-msg" style="color:var(--neon-cyan);">ESTABLISHING OMEGA MIND LINK...</div>
+    </header>
 
-    <div class="header-container">
-        <div>
-            <h1>NEXUS VORTEX</h1>
-            <div class="subtitle">DYNAMIC ASSET MANIFEST & DB UPLINK</div>
-            <div id="sys-status" class="sys-msg">INITIALIZING SYSTEM...</div>
+    <!-- Carousel Navigation -->
+    <div class="carousel-nav">
+        <button class="nav-btn active" onclick="setSlide(0)">1. WORLD BRIDGE</button>
+        <button class="nav-btn" onclick="setSlide(1)">2. OBJECT BRIDGE</button>
+        <button class="nav-btn" onclick="setSlide(2)">3. ARCHITECT BUILD</button>
+    </div>
+
+    <main class="carousel-container">
+        
+        <!-- PAGE 1: WORLD CALL MATCHING -->
+        <div id="slide-0" class="page-section active">
+            <div class="h-panel">
+                <h2>WORLD GENERATOR BRIDGE</h2>
+                <div class="form-group">
+                    <label>SELECT REPOSITORY BRIDGE LINK</label>
+                    <select id="world-bridge-select">
+                        <option value="WORLD_GEN_CORE_ALPHA">Nexus Master Engine (mesh-emv-indexing)</option>
+                        <option value="WORLD_GEN_EXPANSION">Sub-Dimensional Biome Generator</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>WORLD MATCHING INDEX ID</label>
+                    <input type="text" id="world-name-id" placeholder="e.g. BIOME_INFERNO">
+                </div>
+                <div class="form-group">
+                    <label>INJECT WORLD CODE / WRAP LINK</label>
+                    <textarea id="world-payload" placeholder="Paste raw environment wrap URL (.mov, .mp4)..."></textarea>
+                </div>
+                <button class="btn-action" onclick="injectManifest('world')">DEPLOY WORLD INJECTION</button>
+                <div id="world-feedback" class="sys-msg"></div>
+            </div>
+            <!-- Move to next slide -->
+            <button class="btn-action" style="border:none; color:#888;" onclick="setSlide(1)">Next Step ➔</button>
         </div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-action btn-alt no-print" onclick="testPayloadExtraction()">[ TEST PAYLOAD EXTRACT ]</button>
-            <button class="btn-action no-print" onclick="window.print()">[ EXPORT TO PDF ]</button>
+
+        <!-- PAGE 2: OBJECT CALL MATCHING -->
+        <div id="slide-1" class="page-section">
+            <div class="h-panel">
+                <h2>OBJECT ENTITY BRIDGE</h2>
+                <div class="form-group">
+                    <label>SELECT WORLD REPOSITORY TARGET</label>
+                    <select id="object-bridge-select">
+                        <option value="OBJ_RIG_BEHEMOTH">Kinematic Creature & Behemoth Rig</option>
+                        <option value="OBJ_UI_HOLO">Holographic Terminal / UI Panel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>OBJECT ENTITY MATCHING ID</label>
+                    <input type="text" id="object-name-id" placeholder="e.g. ENTITY_DRAGON_SKIN">
+                </div>
+                <div class="form-group">
+                    <label>INJECT OBJECT SCRIPT / TEXTURE LINK</label>
+                    <textarea id="object-payload" placeholder="Paste skin texture URL (.png) or logic code..."></textarea>
+                </div>
+                <button class="btn-action" onclick="injectManifest('object')">DEPLOY OBJECT INJECTION</button>
+                <div id="object-feedback" class="sys-msg"></div>
+            </div>
+            <!-- Move to next slide -->
+            <button class="btn-action" style="border:none; color:#888;" onclick="setSlide(2)">Next Step ➔</button>
+        </div>
+
+        <!-- PAGE 3: WORLD GENERATOR (ARCHITECT) -->
+        <div id="slide-2" class="page-section">
+            <div class="h-panel">
+                <h2>ARCHITECT PLANETARY COMPILER</h2>
+                <p style="font-size:0.8rem; color:#88a0b5; margin-bottom: 15px;">
+                    Use the links you injected in the previous steps, or input new parameters to finalize the planetary build via Gemini.
+                </p>
+                <div class="form-group">
+                    <label>Designate World Name</label>
+                    <input type="text" id="final-world-name" placeholder="e.g. Tartarus">
+                </div>
+                <div class="form-group">
+                    <label>Target Web Link (Portal Destination)</label>
+                    <input type="url" id="final-target-url" placeholder="https://...">
+                </div>
+                <hr style="border: 0; border-bottom: 1px solid rgba(0,240,255,0.2); margin: 20px 0;">
+                <div class="form-group"><label>Space Atmosphere (URL)</label><input type="text" id="tex-space"></div>
+                <div class="form-group"><label>Sky Dome (URL)</label><input type="text" id="tex-sky"></div>
+                <div class="form-group"><label>Land Mass / Terrain (URL)</label><input type="text" id="tex-land"></div>
+                <div class="form-group"><label>Water Layer (URL)</label><input type="text" id="tex-water"></div>
+                
+                <button class="btn-action btn-submit" id="generate-gemini-btn" onclick="triggerGeneration()">🚀 COMPILE WORLD VIA GEMINI</button>
+                <div id="gen-feedback" class="sys-msg"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Minimizable Telemetry View -->
+    <button class="telemetry-toggle" onclick="toggleTelemetry()">[ EXPAND TELEMETRY & ENGINE VIEW ]</button>
+
+    <div class="telemetry-container" id="telemetry-container">
+        <!-- Tables -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>INDEX ID</th><th>TARGET BRIDGE</th><th>PAYLOAD PREVIEW</th><th>ORIGIN NODE</th></tr>
+                </thead>
+                <tbody id="telemetry-feed">
+                    <tr><td colspan="4" style="text-align:center;">Syncing matrix...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Nexus World Engine Iframe -->
+        <h2 style="text-align:center; color:var(--neon-cyan); border:none; margin: 10px 0;">NEXUS WORLD ENGINE NODE</h2>
+        <div class="engine-frame-container">
+            <iframe src="https://nexus-world-engine.vercel.app" allow="autoplay; fullscreen"></iframe>
         </div>
     </div>
 
-    <!-- Payload Extraction Console -->
-    <div id="extraction-console" class="no-print">Awaiting extraction command...</div>
-
-    <!-- Data Injection Panel -->
-    <div class="control-panel no-print">
-        <input type="text" id="inp-id" placeholder="INDEX_ID (e.g. BIOME_01)">
-        <input type="text" id="inp-type" placeholder="TYPE (e.g. Video .mp4)">
-        <input type="text" id="inp-desc" placeholder="DESCRIPTION / ASSIGNMENT">
-        <input type="url" id="inp-url" placeholder="RAW URL (https://...)">
-        <button class="btn-action" id="btn-inject" onclick="injectAsset()">[ INJECT ASSET ]</button>
-    </div>
-
-    <!-- Live Data Table -->
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th width="15%">INDEX ID</th>
-                    <th width="15%">TYPE</th>
-                    <th width="25%">DESCRIPTION / ASSIGNMENT</th>
-                    <th width="25%">RAW URL</th>
-                    <th width="20%">ORIGIN</th>
-                </tr>
-            </thead>
-            <tbody id="manifest-body">
-                <tr><td colspan="5" style="text-align:center; color:#555;">Awaiting telemetry...</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <footer><span style="color:var(--neon-cyan)">⚡</span> POWERED BY OMEGA MIND <span style="color:var(--neon-cyan)">⚡</span></footer>
 
 <script>
-    // iOS safety override to guarantee background video playback
-    document.body.addEventListener('click', () => {
-        const vid = document.getElementById('bgVideo');
-        if (vid && vid.paused) vid.play().catch(e => console.log(e));
-    }, { once: true });
-
-    const manifestBody = document.getElementById('manifest-body');
-    const sysStatus = document.getElementById('sys-status');
-    const extractionConsole = document.getElementById('extraction-console');
-    
-    const OMEGA_REPO_NAME = 'mesh-emv-indexing.vercel.app';
+    // ────────────────────────────────────────────────
+    // Supabase Initialization
+    // ────────────────────────────────────────────────
+    const SUPABASE_URL = 'https://amulgdbdvxpikpmldyoq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtdWxnZGJkdnhwaWtwbWxkeW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MDU3MzgsImV4cCI6MjEwMTk4MTczOH0.0eZ3SfWhUEzSLpDDKEE_3vp5siXF00akRp5jX1dM-dA';
     let dbClient = null;
+    const OMEGA_REPO_NAME = window.location.hostname || 'Master-Architect-Node';
 
-    // Boot Engine with Retry Logic
-    function bootSystem() {
-        if (window.supabase) {
-            initSupabase();
+    async function initSystem() {
+        if (!window.supabase) return;
+        dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        document.getElementById('sys-status').innerText = "OMEGA MIND LINK SECURE.";
+        fetchTelemetryFeeds();
+        
+        // Auto-fill inputs on Tab 3 from inputs on Tab 1 & 2 for convenience
+        document.getElementById('world-payload').addEventListener('input', (e) => {
+            document.getElementById('tex-land').value = e.target.value;
+        });
+        document.getElementById('object-payload').addEventListener('input', (e) => {
+            // Assuming object payload might be a skin texture
+            document.getElementById('tex-water').value = e.target.value; 
+        });
+    }
+
+    // ────────────────────────────────────────────────
+    // Carousel Logic
+    // ────────────────────────────────────────────────
+    function setSlide(index) {
+        const slides = document.querySelectorAll('.page-section');
+        const btns = document.querySelectorAll('.nav-btn');
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === index);
+            btns[i].classList.toggle('active', i === index);
+        });
+    }
+
+    // ────────────────────────────────────────────────
+    // Telemetry Toggle Logic
+    // ────────────────────────────────────────────────
+    let telemetryOpen = false;
+    function toggleTelemetry() {
+        telemetryOpen = !telemetryOpen;
+        const container = document.getElementById('telemetry-container');
+        const btn = document.querySelector('.telemetry-toggle');
+        if (telemetryOpen) {
+            container.style.display = 'flex';
+            btn.innerText = "[ MINIMIZE TELEMETRY & ENGINE VIEW ]";
+            fetchTelemetryFeeds(); // Refresh data when opened
         } else {
-            sysStatus.innerText = "WAITING FOR CDN CONNECTION...";
-            let retries = 0;
-            let checkInterval = setInterval(() => {
-                if (window.supabase) {
-                    clearInterval(checkInterval);
-                    initSupabase();
-                }
-                if (retries++ > 50) { 
-                    clearInterval(checkInterval);
-                    sysStatus.innerText = "CRITICAL: SUPABASE SCRIPT BLOCKED BY BROWSER OR NETWORK.";
-                    sysStatus.className = "sys-msg error-msg";
-                    manifestBody.innerHTML = '<tr><td colspan="5" class="error-msg" style="text-align:center;">Network Error: Cannot reach Supabase CDN. Check Adblockers.</td></tr>';
-                }
-            }, 100);
+            container.style.display = 'none';
+            btn.innerText = "[ EXPAND TELEMETRY & ENGINE VIEW ]";
         }
     }
 
-    async function initSupabase() {
-        sysStatus.innerText = "ESTABLISHING OMEGA MIND LINK...";
-        try {
-            const SUPABASE_URL = 'https://amulgdbdvxpikpmldyoq.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtdWxnZGJkdnhwaWtwbWxkeW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MDU3MzgsImV4cCI6MjEwMTk4MTczOH0.0eZ3SfWhUEzSLpDDKEE_3vp5siXF00akRp5jX1dM-dA';
-            
-            dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            
-            await fetchAssets();
-            initTelemetry();
+    // ────────────────────────────────────────────────
+    // Data Injection (World & Object Bridges)
+    // ────────────────────────────────────────────────
+    window.injectManifest = async function(type) {
+        if (!dbClient) return alert("Database not initialized.");
+        const isWorld = type === 'world';
+        
+        const bridgeSelect = document.getElementById(isWorld ? 'world-bridge-select' : 'object-bridge-select').value;
+        const indexId = document.getElementById(isWorld ? 'world-name-id' : 'object-name-id').value.trim().toUpperCase();
+        const payloadVal = document.getElementById(isWorld ? 'world-payload' : 'object-payload').value.trim();
+        const feedback = document.getElementById(isWorld ? 'world-feedback' : 'object-feedback');
 
-        } catch (err) {
-            console.error("Init Error:", err);
-            sysStatus.innerText = "CRITICAL ERROR: " + err.message;
-            sysStatus.className = "sys-msg error-msg";
-        }
-    }
-
-    async function fetchAssets() {
-        try {
-            const { data, error } = await dbClient
-                .from('asset_manifest')
-                .select('*')
-                .order('index_id', { ascending: true });
-
-            if (error) throw error;
-
-            if (data && data.length > 0) {
-                manifestBody.innerHTML = ''; 
-                data.forEach(asset => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="index-id">${escapeHTML(asset.index_id)}</td>
-                        <td class="asset-type">${escapeHTML(asset.asset_type)}</td>
-                        <td>${escapeHTML(asset.description)}</td>
-                        <td><a href="${escapeHTML(asset.raw_url)}" target="_blank">LINK</a></td>
-                        <td style="color:#888; font-size:0.75rem;">${escapeHTML(asset.origin_repo)}</td>
-                    `;
-                    manifestBody.appendChild(row);
-                });
-                sysStatus.innerText = `LINK SECURE. FETCHED ${data.length} ASSETS.`;
-                sysStatus.className = "sys-msg";
-            } else {
-                manifestBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">DATABASE CONNECTED BUT EMPTY.</td></tr>';
-                sysStatus.innerText = `LINK SECURE. 0 ASSETS FOUND.`;
-                sysStatus.className = "sys-msg";
-            }
-        } catch (err) {
-            console.error("Database Fetch Error:", err);
-            sysStatus.innerText = "ERROR: FAILED TO FETCH. DID YOU RUN THE SQL SCRIPT?";
-            sysStatus.className = "sys-msg error-msg";
-            manifestBody.innerHTML = `<tr><td colspan="5" class="error-msg" style="text-align:center;">Database Error: ${err.message}</td></tr>`;
-        }
-    }
-
-    window.injectAsset = async function() {
-        if (!dbClient) return alert("System not initialized.");
-
-        const idInput = document.getElementById('inp-id');
-        const typeInput = document.getElementById('inp-type');
-        const descInput = document.getElementById('inp-desc');
-        const urlInput = document.getElementById('inp-url');
-        const btnInject = document.getElementById('btn-inject');
-
-        const payload = {
-            index_id: idInput.value.trim().toUpperCase(),
-            asset_type: typeInput.value.trim(),
-            description: descInput.value.trim(),
-            raw_url: urlInput.value.trim(),
-            origin_repo: window.location.hostname || OMEGA_REPO_NAME,
-            origin_url: window.location.href
-        };
-
-        if (!payload.index_id || !payload.raw_url) {
-            alert("INDEX_ID and RAW_URL are required fields.");
+        if (!indexId || !payloadVal) {
+            feedback.innerText = "Error: ID and Payload required.";
             return;
         }
 
-        btnInject.innerText = "[ PROCESSING... ]";
-        btnInject.style.pointerEvents = "none";
-
-        try {
-            const { error } = await dbClient.from('asset_manifest').insert([payload]);
-            if (error) throw error;
-
-            idInput.value = ''; typeInput.value = ''; descInput.value = ''; urlInput.value = '';
-            sysStatus.innerText = `SUCCESS: INJECTED ${payload.index_id} FROM ${payload.origin_repo}.`;
-            sysStatus.className = "sys-msg";
-            await fetchAssets();
-            
-        } catch (err) {
-            console.error("Injection Error:", err);
-            alert("Failed to inject: " + err.message);
-        } finally {
-            btnInject.innerText = "[ INJECT ASSET ]";
-            btnInject.style.pointerEvents = "auto";
-        }
-    }
-
-    window.testPayloadExtraction = async function() {
-        extractionConsole.style.display = 'block';
-        extractionConsole.innerText = "Initiating payload extraction via RPC...";
+        feedback.innerText = "INJECTING PROTOCOL...";
         
+        const record = {
+            index_id: indexId,
+            asset_type: isWorld ? `WORLD_BRIDGE_${bridgeSelect}` : `OBJ_BRIDGE_${bridgeSelect}`,
+            description: "Carousel Bridge Injection",
+            raw_url: payloadVal,
+            origin_repo: OMEGA_REPO_NAME,
+            origin_url: window.location.href
+        };
+
         try {
-            const { data: payload, error } = await dbClient.rpc('extract_asset_payload');
-            
+            const { error } = await dbClient.from('asset_manifest').insert([record]);
+            if (error) throw error;
+            feedback.innerText = `SUCCESS: ${indexId} SECURED.`;
+            if (telemetryOpen) fetchTelemetryFeeds();
+        } catch (err) {
+            feedback.innerText = `FAULT: ${err.message}`;
+        }
+    };
+
+    // ────────────────────────────────────────────────
+    // Fetch Telemetry Feed
+    // ────────────────────────────────────────────────
+    async function fetchTelemetryFeeds() {
+        if (!dbClient) return;
+        try {
+            const { data, error } = await dbClient.from('asset_manifest').select('*').order('created_at', { ascending: false }).limit(20);
             if (error) throw error;
 
-            extractionConsole.innerText = `[SUCCESS] Payload Extracted (${payload.length} objects):\n\n` + JSON.stringify(payload, null, 2);
+            const feed = document.getElementById('telemetry-feed');
+            feed.innerHTML = '';
+            
+            if (data.length === 0) {
+                feed.innerHTML = '<tr><td colspan="4" style="text-align:center;">Matrix Empty.</td></tr>';
+                return;
+            }
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="color:var(--neon-cyan); font-weight:bold;">${escapeHTML(item.index_id)}</td>
+                    <td style="color:var(--neon-pink);">${escapeHTML(item.asset_type)}</td>
+                    <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(item.raw_url)}</td>
+                    <td style="color:#888;">${escapeHTML(item.origin_repo)}</td>
+                `;
+                feed.appendChild(row);
+            });
         } catch (err) {
-            extractionConsole.innerText = `[SYS_ERR] RPC Extraction Failed:\n${err.message}\n\nDid you run the SQL script to create the 'extract_asset_payload' function?`;
+            console.error("Feed error:", err);
         }
     }
 
     function escapeHTML(str) {
         if (!str) return "UNKNOWN";
-        return str.replace(/[&<>'"]/g, 
-            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag])
-        );
+        return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
     }
 
-    function initTelemetry() {
-        let clientIP = 'Detecting...';
-        fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => { clientIP = data.ip; }).catch(() => {});
-        window.logBrainAction = async function(actionType, details = {}) {
-            try {
-                await dbClient.from('central_telemetry').insert([{
-                    repository_name: window.location.hostname || OMEGA_REPO_NAME, 
-                    action_type: actionType,
-                    details: { ...details, ip_address: clientIP, url: window.location.href, timestamp: new Date().toISOString() }
-                }]);
-            } catch (err) {}
+    // ────────────────────────────────────────────────
+    // Architect Generation (API Handler)
+    // ────────────────────────────────────────────────
+    window.triggerGeneration = async function() {
+        const feedback = document.getElementById('gen-feedback');
+        feedback.innerText = "TRANSMITTING TO GEMINI API...";
+
+        const payload = {
+            targetUrl: document.getElementById('final-target-url').value || "https://nexus.olympus",
+            textures: {
+                space: document.getElementById('tex-space').value,
+                sky: document.getElementById('tex-sky').value,
+                land: document.getElementById('tex-land').value,
+                water: document.getElementById('tex-water').value
+            },
+            geminiOverride: true
         };
-        window.logBrainAction('page_load', { title: document.title });
-    }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bootSystem);
-    } else {
-        bootSystem();
-    }
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`API Fault: ${response.statusText}`);
+            
+            const result = await response.json();
+            console.log(result);
+            feedback.innerText = "WORLD SUCCESSFULLY COMPILED. CHECK DATABASE.";
+            
+            // In a production app, redirect or show success iframe here
+        } catch (err) {
+            feedback.innerText = `GENERATION FAULT: ${err.message}`;
+        }
+    };
+
+    window.addEventListener('DOMContentLoaded', initSystem);
 </script>
 
 </body>
