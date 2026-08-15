@@ -108,6 +108,17 @@
         th { background: rgba(255,0,255,0.1); color: var(--neon-pink); }
         td { color: #fff; }
 
+        /* Styles for clickable links in the telemetry table */
+        #telemetry-feed a {
+            color: #fff;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+
+        #telemetry-feed a:hover {
+            color: var(--neon-cyan);
+        }
+
         .engine-frame-container {
             width: 100%; height: 600px; border: 1px solid var(--neon-cyan); border-radius: 8px;
             background: #000; overflow: hidden; box-shadow: 0 0 25px rgba(0,240,255,0.2);
@@ -353,11 +364,24 @@
 
             data.forEach(item => {
                 const row = document.createElement('tr');
+                
+                // Escape data for safely inserting into HTML, 
+                // but keep raw_url raw for href attribute
+                const indexId = escapeHTML(item.index_id);
+                const assetType = escapeHTML(item.asset_type);
+                const rawUrl = escapeHTML(item.raw_url);
+                const originRepo = escapeHTML(item.origin_repo);
+
                 row.innerHTML = `
-                    <td style="color:var(--neon-cyan); font-weight:bold;">${escapeHTML(item.index_id)}</td>
-                    <td style="color:var(--neon-pink);">${escapeHTML(item.asset_type)}</td>
-                    <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(item.raw_url)}</td>
-                    <td style="color:#888;">${escapeHTML(item.origin_repo)}</td>
+                    <td style="color:var(--neon-cyan); font-weight:bold;">${indexId}</td>
+                    <td style="color:var(--neon-pink);">${assetType}</td>
+                    <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        <!-- Wrapped content in <a> tag and ensured style for clickable area -->
+                        <a href="${item.raw_url}" target="_blank" title="${rawUrl}" style="display:inline-block; max-width:100%; overflow:hidden; text-overflow:ellipsis;">
+                            ${rawUrl}
+                        </a>
+                    </td>
+                    <td style="color:#888;">${originRepo}</td>
                 `;
                 feed.appendChild(row);
             });
